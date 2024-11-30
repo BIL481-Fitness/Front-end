@@ -1,0 +1,26 @@
+{
+    "welcome": "Welcome to FITTrack",
+    "profile": "My Profile",
+    "program": "My Program",
+    "progress": "My Progress",
+    "trainers": "Personal Trainers",
+    "createWorkout": "Create Workout",
+    "saveChanges": "Save Changes",
+    "name": "Name",
+    "email": "Email",
+    "age": "Age",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "programHeader": "My Program",
+    "programDescription": "This is your personalized fitness program.",
+    "workoutPlan": "Workout Plan",
+    "mondayWorkout": "Monday: Chest & Triceps",
+    "tuesdayWorkout": "Tuesday: Back & Biceps",
+    "wednesdayWorkout": "Wednesday: Rest Days",
+    "thursdayWorkout": "Thursday: Legs & Shoulders",
+    "fridayWorkout": "Friday: Full Body",
+    "saturdayWorkout": "Saturday: Rest Days",
+    "sundayWorkout": "Sunday: Cardio & Abs",
+    "intensityLevel": "Intensity Level: Moderate"
+  }
+  

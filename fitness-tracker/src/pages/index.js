@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
 export default function Home() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Kullanıcı login değilse, login sayfasına yönlendir
