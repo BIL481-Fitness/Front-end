@@ -8,46 +8,48 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    console.log('Sending Request:', { name: username, password }); // Debug: log request body
+    try {
+      console.log('Sending Request:', { name: username, password }); // Debug: log request body
 
-    const response = await fetch('https://backend-u0ol.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name: username, password }),
-    });
+      const response = await fetch('https://backend-u0ol.onrender.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: username, password }),
+      });
 
-    console.log('Response Status:', response.status); // Debug: log response status
+      console.log('Response Status:', response.status); // Debug: log response status
 
-    if (response.status === 200) {
-      // The API returns a plain string on success
-      const successMessage = await response.text();
-      console.log('Login Successful:', successMessage); // Debug: log success response
-      sessionStorage.setItem('isLoggedIn', 'true');
-      sessionStorage.setItem('token', successMessage || ''); // Store the string if it represents a token
-      router.push('/');
-    } else if (response.status === 422) {
-      // The API returns JSON on validation errors
-      const errorData = await response.json();
-      console.error('Validation Error:', errorData); // Debug: log validation error
-      setError(errorData.detail?.[0]?.msg || 'Validation error occurred.');
-    } else {
-      // Handle unexpected statuses
-      const errorText = await response.text();
-      console.error('Unexpected Error:', errorText); // Debug: log unexpected error
-      setError('An unexpected error occurred. Please try again.');
+      if (response.status === 200) {
+        // The API returns a plain string (e.g., userId or token)
+        const userId = await response.text();
+        console.log('Login Successful, User ID:', userId);
+
+        // Store userId in sessionStorage
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userId', userId); // Store the user ID as a string
+
+        router.push('/'); // Redirect to homepage
+      } else if (response.status === 422) {
+        // The API returns JSON on validation errors
+        const errorData = await response.json();
+        console.error('Validation Error:', errorData);
+        setError(errorData.detail?.[0]?.msg || 'Validation error occurred.');
+      } else {
+        // Handle unexpected statuses
+        const errorText = await response.text();
+        console.error('Unexpected Error:', errorText);
+        setError('An unexpected error occurred. Please try again.');
+      }
+    } catch (err) {
+      // Handle network or unexpected errors
+      console.error('Unexpected Error:', err);
+      setError('An unexpected error occurred. Please try again later.');
     }
-  } catch (err) {
-    // Handle network or unexpected errors
-    console.error('Unexpected Error:', err); // Debug: log unexpected errors
-    setError('An unexpected error occurred. Please try again later.');
-  }
-};
-
+  };
 
   return (
     <div
