@@ -79,22 +79,21 @@ const Header = () => {
       )}
       {/* Tema Değiştir Butonu */}
       <button
-        onClick={toggleTheme}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          padding: '10px',
-          backgroundColor: theme === 'light' ? '#4B0082' : '#9370DB',
-          border: 'none',
-          borderRadius: '5px',
-          color: '#ffffff',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-        }}
-      >
-        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-      </button>
+      onClick={toggleTheme}
+      style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        padding: '10px 20px',
+        backgroundColor: theme === 'dark' ? '#333' : '#fff',
+        color: theme === 'dark' ? '#fff' : '#333',
+        border: '1px solid',
+        borderRadius: '5px',
+        cursor: 'pointer',
+      }}
+    >
+      {theme === 'dark' ? t('lightMode') : t('darkMode')}
+    </button>
       {/* Dil Değiştir Butonu */}
       <button
         onClick={changeLanguage}

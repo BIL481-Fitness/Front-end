@@ -21,6 +21,8 @@
     "fridayWorkout": "Friday: Full Body",
     "saturdayWorkout": "Saturday: Rest Days",
     "sundayWorkout": "Sunday: Cardio & Abs",
-    "intensityLevel": "Intensity Level: Moderate"
+    "intensityLevel": "Intensity Level: Moderate",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
   }
   
