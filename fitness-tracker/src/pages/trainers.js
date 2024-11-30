@@ -1,82 +1,49 @@
-import React, { useState } from 'react';
+import { useTheme } from '../components/ThemeProvider';
 
-const trainersData = [
-  {
-    id: 1,
-    name: 'John Smith',
-    specialty: 'Strength Training',
-    bio: '10 years of experience in strength and conditioning.',
-  },
-  {
-    id: 2,
-    name: 'Emily Johnson',
-    specialty: 'Yoga',
-    bio: 'Certified yoga instructor with a passion for mental wellness.',
-  },
-  {
-    id: 3,
-    name: 'Michael Brown',
-    specialty: 'Cardio Workouts',
-    bio: 'Helping people achieve their cardio fitness goals for over 8 years.',
-  },
-];
+export default function Trainers() {
+  const { theme } = useTheme();
 
-const Trainers = () => {
-  const [selectedTrainer, setSelectedTrainer] = useState(null);
-
-  const handleSelectTrainer = (trainer) => {
-    setSelectedTrainer(trainer);
-    alert(`You selected ${trainer.name} as your trainer!`);
-  };
+  const trainers = [
+    { name: 'John Doe', specialty: 'Strength Training' },
+    { name: 'Jane Smith', specialty: 'Cardio & Endurance' },
+    { name: 'Emily Johnson', specialty: 'Yoga & Flexibility' },
+  ];
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Fitness Trainers</h1>
-
-      {/* Seçilen Eğitmen */}
-      {selectedTrainer && (
-        <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc' }}>
-          <h2>Selected Trainer:</h2>
-          <p>
-            <strong>Name:</strong> {selectedTrainer.name}
-          </p>
-          <p>
-            <strong>Specialty:</strong> {selectedTrainer.specialty}
-          </p>
-          <p>
-            <strong>Bio:</strong> {selectedTrainer.bio}
-          </p>
-        </div>
-      )}
-
-      {/* Eğitmenler Listesi */}
-      <div>
-        {trainersData.map((trainer) => (
+    <div
+      style={{
+        backgroundColor: theme === 'light' ? '#ffffff' : '#1e1e1e',
+        color: theme === 'light' ? '#000000' : '#ffffff',
+        minHeight: '100vh',
+        padding: '20px',
+      }}
+    >
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Personal Trainers</h1>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '20px',
+          justifyContent: 'center',
+        }}
+      >
+        {trainers.map((trainer, index) => (
           <div
-            key={trainer.id}
+            key={index}
             style={{
-              marginBottom: '20px',
-              padding: '10px',
-              border: '1px solid #ccc',
+              padding: '15px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
               borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              width: '250px',
+              textAlign: 'center',
             }}
           >
-            <h2>{trainer.name}</h2>
-            <p>
-              <strong>Specialty:</strong> {trainer.specialty}
-            </p>
-            <p>{trainer.bio}</p>
-            <button
-              onClick={() => handleSelectTrainer(trainer)}
-              style={{ padding: '8px 15px', cursor: 'pointer' }}
-            >
-              Select
-            </button>
+            <h3>{trainer.name}</h3>
+            <p>{trainer.specialty}</p>
           </div>
         ))}
       </div>
     </div>
   );
-};
-
-export default Trainers;
+}

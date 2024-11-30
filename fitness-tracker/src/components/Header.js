@@ -1,54 +1,107 @@
-import React from 'react';
+import { useRouter } from 'next/router';
+import { useTheme } from './ThemeProvider';
 import Link from 'next/link';
 
 const Header = () => {
+  const router = useRouter();
+  const { theme } = useTheme();
+
+  // Sadece login sayfasında FITTrack gösterilsin
+  const isLoginPage = router.pathname === '/login';
+
   return (
     <header
       style={{
+        padding: '20px 40px',
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: isLoginPage ? 'center' : 'space-between',
         alignItems: 'center',
-        padding: '20px',
-        borderBottom: '1px solid #e5e5e5',
+        backgroundColor: theme === 'light' ? '#ffffff' : '#1e1e1e',
+        color: theme === 'light' ? '#000000' : '#ffffff',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
       }}
     >
-      {/* Sol Taraf: Logo */}
-      <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e1e1e' }}>
-        <Link href="/" style={{ textDecoration: 'none', color: '#1e1e1e' }}>
-          FITTrack
-        </Link>
-      </div>
-
-      {/* Sağ Taraf: Navigasyon Linkleri */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <Link href="/profile" style={{ textDecoration: 'none', color: '#1e1e1e', fontWeight: '500' }}>
-          My Profile
-        </Link>
-        <Link href="/schedule" style={{ textDecoration: 'none', color: '#1e1e1e', fontWeight: '500' }}>
-          My Program
-        </Link>
-        <Link href="/progress" style={{ textDecoration: 'none', color: '#1e1e1e', fontWeight: '500' }}>
-          My Progress
-        </Link>
-        <Link href="/trainers" style={{ textDecoration: 'none', color: '#1e1e1e', fontWeight: '500' }}>
-          Personal Trainers
-        </Link>
-        <Link href="/create-workout">
-          <button
+      <div>
+        <Link href="/" passHref>
+          <span
             style={{
-              backgroundColor: '#3B82F6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              padding: '10px 20px',
-              cursor: 'pointer',
+              textDecoration: 'none',
+              fontSize: '1.8rem',
               fontWeight: 'bold',
+              color: theme === 'light' ? '#241F6B' : '#9370DB',
+              cursor: 'pointer',
             }}
           >
-            Create Workout
-          </button>
+            FITTrack
+          </span>
         </Link>
-      </nav>
+      </div>
+      {!isLoginPage && (
+        <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <Link href="/profile">
+            <span
+              style={{
+                color: theme === 'light' ? '#000000' : '#ffffff',
+                textDecoration: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              My profile
+            </span>
+          </Link>
+          <Link href="/schedule">
+            <span
+              style={{
+                color: theme === 'light' ? '#000000' : '#ffffff',
+                textDecoration: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              My program
+            </span>
+          </Link>
+          <Link href="/progress">
+            <span
+              style={{
+                color: theme === 'light' ? '#000000' : '#ffffff',
+                textDecoration: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              My progress
+            </span>
+          </Link>
+          <Link href="/trainers">
+            <span
+              style={{
+                color: theme === 'light' ? '#000000' : '#ffffff',
+                textDecoration: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Personal Trainers
+            </span>
+          </Link>
+          <Link href="/create-workout">
+            <button
+              style={{
+                padding: '10px 20px',
+                backgroundColor: theme === 'light' ? '#241F6B' : '#9370DB',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '5px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              Create Workout
+            </button>
+          </Link>
+        </nav>
+      )}
     </header>
   );
 };

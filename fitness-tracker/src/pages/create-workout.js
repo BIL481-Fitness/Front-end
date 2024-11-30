@@ -1,95 +1,103 @@
-import React, { useState } from 'react';
+import { useTheme } from '../components/ThemeProvider';
 
-const CreateWorkout = () => {
-  const [workout, setWorkout] = useState({
-    name: '',
-    duration: '',
-    intensity: '',
-    description: '',
-  });
-
-  const [message, setMessage] = useState('');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setWorkout({ ...workout, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Şimdilik veriyi konsola yazıyoruz, backend bağlanınca buradan API'ye gönderilebilir
-    console.log('Workout created:', workout);
-    setMessage('Workout successfully created!');
-    setWorkout({ name: '', duration: '', intensity: '', description: '' });
-  };
+export default function CreateWorkout() {
+  const { theme } = useTheme();
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Create a New Workout</h1>
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '400px' }}>
+    <div
+      style={{
+        backgroundColor: theme === 'light' ? '#ffffff' : '#1e1e1e',
+        color: theme === 'light' ? '#000000' : '#ffffff',
+        minHeight: '100vh',
+        padding: '20px',
+      }}
+    >
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Create a New Workout</h1>
+      <form
+        style={{
+          maxWidth: '400px',
+          margin: '0 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '15px',
+        }}
+      >
         <label>
           Workout Name:
           <input
             type="text"
-            name="name"
-            value={workout.name}
-            onChange={handleChange}
             placeholder="Enter workout name"
-            style={{ marginBottom: '10px', padding: '8px' }}
-            required
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
           />
         </label>
-
         <label>
           Duration (in minutes):
           <input
             type="number"
-            name="duration"
-            value={workout.duration}
-            onChange={handleChange}
             placeholder="Enter duration"
-            style={{ marginBottom: '10px', padding: '8px' }}
-            required
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
           />
         </label>
-
         <label>
           Intensity:
           <select
-            name="intensity"
-            value={workout.intensity}
-            onChange={handleChange}
-            style={{ marginBottom: '10px', padding: '8px' }}
-            required
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
           >
-            <option value="" disabled>
-              Select intensity
-            </option>
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
           </select>
         </label>
-
         <label>
           Description:
           <textarea
-            name="description"
-            value={workout.description}
-            onChange={handleChange}
             placeholder="Enter workout description (optional)"
-            style={{ marginBottom: '10px', padding: '8px', height: '80px' }}
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
           />
         </label>
-
-        <button type="submit" style={{ padding: '10px 20px', cursor: 'pointer' }}>
+        <button
+          type="submit"
+          style={{
+            padding: '10px',
+            border: 'none',
+            borderRadius: '5px',
+            backgroundColor: theme === 'light' ? '#007BFF' : '#00C4FF',
+            color: '#ffffff',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+          }}
+        >
           Create Workout
         </button>
       </form>
     </div>
   );
-};
-
-export default CreateWorkout;
+}

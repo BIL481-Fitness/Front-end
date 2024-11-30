@@ -1,37 +1,22 @@
-import React from 'react';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { useTheme } from '../components/ThemeProvider';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+// Ölçekleri ve elemanları kaydet
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 export default function Progress() {
-  // Örnek veri
+  const { theme } = useTheme();
+
   const data = {
-    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'], // Haftalar
+    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
     datasets: [
       {
-        label: 'Weight Lifted (kg)', // Verinin açıklaması
-        data: [50, 55, 60, 65, 70, 75], // Haftalık ilerleme
-        borderColor: 'rgba(75,192,192,1)', // Çizgi rengi
-        backgroundColor: 'rgba(75,192,192,0.2)', // Çizgi altı dolgusu
-        tension: 0.4, // Çizgi yumuşatma
+        label: 'Weight Lifted (kg)',
+        data: [50, 55, 60, 65, 70, 75],
+        borderColor: '#00C4FF',
+        backgroundColor: 'rgba(0, 196, 255, 0.2)',
+        tension: 0.4,
       },
     ],
   };
@@ -40,21 +25,35 @@ export default function Progress() {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top', // Legend konumu
+        labels: {
+          color: theme === 'light' ? '#000000' : '#ffffff', // Yazı rengi
+        },
       },
-      title: {
-        display: true,
-        text: 'Fitness Progress Over Time', // Grafiğin başlığı
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: theme === 'light' ? '#000000' : '#ffffff', // X ekseni yazı rengi
+        },
+        grid: {
+          color: theme === 'light' ? '#cccccc' : '#444444', // X ekseni grid rengi
+        },
+      },
+      y: {
+        ticks: {
+          color: theme === 'light' ? '#000000' : '#ffffff', // Y ekseni yazı rengi
+        },
+        grid: {
+          color: theme === 'light' ? '#cccccc' : '#444444', // Y ekseni grid rengi
+        },
       },
     },
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ textAlign: 'center' }}>My Progress</h1>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <Line data={data} options={options} />
-      </div>
+    <div style={{ padding: '20px', minHeight: '100vh' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>My Progress</h1>
+      <Line data={data} options={options} />
     </div>
   );
 }
