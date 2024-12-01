@@ -1,6 +1,8 @@
+import '../styles/globals.css';
+import '../../i18n'; 
 import Header from '../components/Header';
 import { ThemeProvider, useTheme } from '../components/ThemeProvider';
-import '../styles/globals.css';
+
 
 export default function App({ Component, pageProps }) {
   return (

@@ -1,13 +1,20 @@
 import { useRouter } from 'next/router';
 import { useTheme } from './ThemeProvider';
+import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
 const Header = () => {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
+  const { t, i18n } = useTranslation();
 
-  // Sadece login sayfasında FITTrack gösterilsin
   const isLoginPage = router.pathname === '/login';
+
+  const changeLanguage = () => {
+    // Mevcut dili değiştir
+    const newLanguage = i18n.language === 'en' ? 'tr' : 'en';
+    i18n.changeLanguage(newLanguage);
+  };
 
   return (
     <header
@@ -31,7 +38,7 @@ const Header = () => {
               textDecoration: 'none',
               fontSize: '1.8rem',
               fontWeight: 'bold',
-              color: theme === 'light' ? '#241F6B' : '#9370DB',
+              color: theme === 'light' ? '#4B0082' : '#9370DB',
               cursor: 'pointer',
             }}
           >
@@ -42,54 +49,22 @@ const Header = () => {
       {!isLoginPage && (
         <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <Link href="/profile">
-            <span
-              style={{
-                color: theme === 'light' ? '#000000' : '#ffffff',
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              My profile
-            </span>
+            <span>{t('profile')}</span>
           </Link>
           <Link href="/schedule">
-            <span
-              style={{
-                color: theme === 'light' ? '#000000' : '#ffffff',
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              My program
-            </span>
+            <span>{t('program')}</span>
           </Link>
           <Link href="/progress">
-            <span
-              style={{
-                color: theme === 'light' ? '#000000' : '#ffffff',
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              My progress
-            </span>
+            <span>{t('progress')}</span>
           </Link>
           <Link href="/trainers">
-            <span
-              style={{
-                color: theme === 'light' ? '#000000' : '#ffffff',
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Personal Trainers
-            </span>
+            <span>{t('trainers')}</span>
           </Link>
           <Link href="/create-workout">
             <button
               style={{
                 padding: '10px 20px',
-                backgroundColor: theme === 'light' ? '#241F6B' : '#9370DB',
+                backgroundColor: theme === 'light' ? '#4B0082' : '#9370DB',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '5px',
@@ -97,11 +72,52 @@ const Header = () => {
                 cursor: 'pointer',
               }}
             >
-              Create Workout
+              {t('createWorkout')}
             </button>
           </Link>
         </nav>
       )}
+      {/* Tema Değiştir Butonu */}
+      <button
+      onClick={toggleTheme}
+      style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        padding: '10px 20px',
+        backgroundColor: theme === 'dark' ? '#333' : '#fff',
+        color: theme === 'dark' ? '#fff' : '#333',
+        border: '1px solid',
+        borderRadius: '5px',
+        cursor: 'pointer',
+      }}
+    >
+      {theme === 'dark' ? t('lightMode') : t('darkMode')}
+    </button>
+      {/* Dil Değiştir Butonu */}
+      <button
+        onClick={changeLanguage}
+        style={{
+          position: 'fixed',
+          bottom: '70px',
+          right: '20px',
+          padding: '10px',
+          backgroundColor: theme === 'light' ? '#007BFF' : '#00C4FF',
+          border: 'none',
+          borderRadius: '5px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        <img
+          src={i18n.language === 'en' ? '/turkey-flag.png' : '/uk-flag.png'}
+          alt="language"
+          style={{ width: '20px', height: '20px' }}
+        />
+        {i18n.language === 'en' ? 'Türkçe' : 'English'}
+      </button>
     </header>
   );
 };

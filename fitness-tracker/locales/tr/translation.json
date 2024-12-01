@@ -1,0 +1,27 @@
+{
+    "welcome": "FITTrack'e Hoşgeldiniz",
+    "profile": "Profilim",
+    "program": "Programım",
+    "progress": "İlerlemem",
+    "trainers": "Kişisel Antrenörler",
+    "createWorkout": "Egzersiz Oluştur",
+    "saveChanges": "Değişiklikleri Kaydet",
+    "name": "İsim",
+    "email": "E-posta",
+    "age": "Yaş",
+    "height": "Boy (cm)",
+    "weight": "Kilo (kg)",
+    "programDescription": "Bu sizin kişisel fitness programınızdır.",
+    "workoutPlan": "Egzersiz Planı",
+    "mondayWorkout": "Pazartesi: Göğüs & Triseps",
+    "tuesdayWorkout": "Salı: Sırt & Biseps",
+    "wednesdayWorkout": "Çarşamba: Dinlenme Günü",
+    "thursdayWorkout": "Perşembe: Bacak & Omuzlar",
+    "fridayWorkout": "Cuma: Tüm Vücut",
+    "saturdayWorkout": "Cumartesi: Dinlenme Günü",
+    "sundayWorkout": "Pazar: Kardiyo & Karın",
+    "intensityLevel": "Yoğunluk Seviyesi: Orta",
+    "lightMode": "Aydınlık Mod",
+    "darkMode": "Karanlık Mod"
+  }
+  
