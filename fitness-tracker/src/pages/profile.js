@@ -1,26 +1,76 @@
-import React, { useState } from 'react'; // React'i içe aktar
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../components/ThemeProvider';
 
 export default function Profile() {
   const { theme } = useTheme();
 
-  // Kullanıcı bilgileri state
+  // State to hold user information
   const [userInfo, setUserInfo] = useState({
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    age: 25,
-    height: 180,
-    weight: 75,
+    name: '',
+    age: '',
+    weight: '',
+    height: '',
+    fitness_level: '',
+    bmi: '',
+    daily_calories: '',
+    goal: '',
   });
 
-  // Input değişikliği yakalama
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserInfo((prevInfo) => ({
-      ...prevInfo,
-      [name]: value,
-    }));
-  };
+  const [loading, setLoading] = useState(true); // State to track loading
+  const [error, setError] = useState(''); // State to track errors
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userId = sessionStorage.getItem('userId'); // Retrieve the stored userId
+
+      if (!userId) {
+        setError('User data not found. Please log in again.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        if (isNaN(userId)) {
+          throw new Error('Invalid user ID');
+        }
+
+        const response = await fetch(`https://backend-u0ol.onrender.com/user_info/${userId}`);
+        if (response.ok) {
+          const data = await response.json(); // Parse JSON response
+          setUserInfo({
+            name: data.name,
+            age: data.age,
+            weight: data.weight,
+            height: data.height,
+            fitness_level: data.fitness_level,
+            bmi: data.bmi,
+            daily_calories: data.daily_calories,
+            goal: data.goal,
+          }); // Update state with user data
+        } else if (response.status === 500) {
+          setError('Internal Server Error. Please try again later.');
+        } else {
+          const errorText = await response.text();
+          setError(`Failed to fetch user data: ${errorText}`);
+        }
+      } catch (err) {
+        console.error('Error fetching user info:', err);
+        setError('An error occurred while fetching user information.');
+      } finally {
+        setLoading(false); // Stop loading indicator
+      }
+    };
+
+    fetchUserInfo();
+  }, []); // Empty dependency array ensures this runs once on mount
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div style={{ color: 'red' }}>{error}</div>;
+  }
 
   return (
     <div
@@ -47,24 +97,7 @@ export default function Profile() {
             type="text"
             name="name"
             value={userInfo.name}
-            onChange={handleInputChange}
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
-          />
-        </label>
-        <label>
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={userInfo.email}
-            onChange={handleInputChange}
+            readOnly
             style={{
               width: '100%',
               padding: '10px',
@@ -81,24 +114,7 @@ export default function Profile() {
             type="number"
             name="age"
             value={userInfo.age}
-            onChange={handleInputChange}
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
-          />
-        </label>
-        <label>
-          Height (cm):
-          <input
-            type="number"
-            name="height"
-            value={userInfo.height}
-            onChange={handleInputChange}
+            readOnly
             style={{
               width: '100%',
               padding: '10px',
@@ -115,7 +131,7 @@ export default function Profile() {
             type="number"
             name="weight"
             value={userInfo.weight}
-            onChange={handleInputChange}
+            readOnly
             style={{
               width: '100%',
               padding: '10px',
@@ -126,20 +142,91 @@ export default function Profile() {
             }}
           />
         </label>
-        <button
-          type="submit"
-          style={{
-            padding: '10px',
-            border: 'none',
-            borderRadius: '5px',
-            backgroundColor: theme === 'light' ? '#007BFF' : '#00C4FF',
-            color: '#ffffff',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-          }}
-        >
-          Save Changes
-        </button>
+        <label>
+          Height (cm):
+          <input
+            type="number"
+            name="height"
+            value={userInfo.height}
+            readOnly
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
+          />
+        </label>
+        <label>
+          Fitness Level:
+          <input
+            type="number"
+            name="fitness_level"
+            value={userInfo.fitness_level}
+            readOnly
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
+          />
+        </label>
+        <label>
+          BMI:
+          <input
+            type="number"
+            name="bmi"
+            value={userInfo.bmi}
+            readOnly
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
+          />
+        </label>
+        <label>
+          Daily Calories:
+          <input
+            type="number"
+            name="daily_calories"
+            value={userInfo.daily_calories}
+            readOnly
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
+          />
+        </label>
+        <label>
+          Goal:
+          <input
+            type="text"
+            name="goal"
+            value={userInfo.goal}
+            readOnly
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+              color: theme === 'light' ? '#000000' : '#ffffff',
+            }}
+          />
+        </label>
       </form>
     </div>
   );

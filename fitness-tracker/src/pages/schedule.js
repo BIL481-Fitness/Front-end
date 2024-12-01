@@ -3,6 +3,12 @@ import { useTheme } from '../components/ThemeProvider';
 export default function Schedule() {
   const { theme } = useTheme();
 
+  const schedule = [
+    { day: 'Monday', activity: 'Cardio and Stretching' },
+    { day: 'Wednesday', activity: 'Strength Training' },
+    { day: 'Friday', activity: 'Yoga and Flexibility' },
+  ];
+
   return (
     <div
       style={{
@@ -21,39 +27,20 @@ export default function Schedule() {
           margin: '0 auto',
         }}
       >
-        <li
-          style={{
-            padding: '15px',
-            border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-            borderRadius: '5px',
-            marginBottom: '10px',
-            backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-          }}
-        >
-          <strong>Monday:</strong> Cardio and Stretching
-        </li>
-        <li
-          style={{
-            padding: '15px',
-            border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-            borderRadius: '5px',
-            marginBottom: '10px',
-            backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-          }}
-        >
-          <strong>Wednesday:</strong> Strength Training
-        </li>
-        <li
-          style={{
-            padding: '15px',
-            border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-            borderRadius: '5px',
-            marginBottom: '10px',
-            backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-          }}
-        >
-          <strong>Friday:</strong> Yoga and Flexibility
-        </li>
+        {schedule.map((item, index) => (
+          <li
+            key={index}
+            style={{
+              padding: '15px',
+              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+              borderRadius: '5px',
+              marginBottom: '10px',
+              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+            }}
+          >
+            <strong>{item.day}:</strong> {item.activity}
+          </li>
+        ))}
       </ul>
     </div>
   );
