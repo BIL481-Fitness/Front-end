@@ -8,49 +8,37 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      console.log('Sending Request:', { name: username, password }); // Debug: log request body
+  try {
+    const response = await fetch('https://backend-u0ol.onrender.com/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: username, password }),
+    });
 
-      const response = await fetch('https://backend-u0ol.onrender.com/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: username, password }),
-      });
+    if (response.status === 200) {
+      const responseData = await response.json();
 
-      console.log('Response Status:', response.status); // Debug: log response status
+      // Store user details in sessionStorage
+      sessionStorage.setItem('isLoggedIn', 'true');
+      sessionStorage.setItem('userId', responseData.id); // Store the user ID
+      sessionStorage.setItem('userRole', responseData.role); // Store the user role
 
-      if (response.status === 200) {
-        // The API returns JSON (e.g., {"id":1,"role":"user"})
-        const responseData = await response.json();
-        console.log('Login Successful, Response Data:', responseData);
-
-        // Store user details in sessionStorage
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userId', responseData.id); // Store the user ID
-        sessionStorage.setItem('userRole', responseData.role); // Store the user role
-
-        router.push('/'); // Redirect to homepage
-      } else if (response.status === 422) {
-        // The API returns JSON on validation errors
-        const errorData = await response.json();
-        console.error('Validation Error:', errorData);
-        setError(errorData.detail?.[0]?.msg || 'Validation error occurred.');
-      } else {
-        // Handle unexpected statuses
-        const errorText = await response.text();
-        console.error('Unexpected Error:', errorText);
-        setError('An unexpected error occurred. Please try again.');
-      }
-    } catch (err) {
-      // Handle network or unexpected errors
-      console.error('Unexpected Error:', err);
-      setError('An unexpected error occurred. Please try again later.');
+      router.push('/'); // Redirect to homepage
+    } else if (response.status === 422) {
+      const errorData = await response.json();
+      setError(errorData.detail?.[0]?.msg || 'Validation error occurred.');
+    } else {
+      setError('An unexpected error occurred. Please try again.');
     }
-  };
+  } catch (err) {
+    setError('An unexpected error occurred. Please try again later.');
+  }
+};
+
 
   return (
     <div
