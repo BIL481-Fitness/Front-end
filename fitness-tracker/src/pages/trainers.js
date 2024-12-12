@@ -23,20 +23,29 @@ export default function Trainers() {
     // Fetch the list of coaches
     const fetchCoaches = async () => {
       try {
-        const response = await fetch('https://backend-u0ol.onrender.com/coaches');
+        const response = await fetch('https://backend-u0ol.onrender.com/coaches', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json', // Ensure JSON response is expected
+          },
+        });
+    
         if (response.ok) {
-          const data = await response.json();
-          setCoaches(data); // Update the state with the fetched coaches
+          const data = await response.json(); // Parse JSON response
+          setCoaches(data); // Set state with fetched coaches
         } else {
-          setError('Failed to fetch coaches.');
+          const errorMessage = `Failed to fetch coaches. Status: ${response.status} - ${response.statusText}`;
+          console.error(errorMessage);
+          setError(errorMessage);
         }
       } catch (err) {
-        setError('A network error occurred. Please try again later.');
+        console.error('Network error:', err);
+        setError('A network error occurred. Please check your connection and try again.');
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchCoaches();
   }, [router]);
 
