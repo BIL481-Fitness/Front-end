@@ -1,17 +1,25 @@
+'use client';
+
 import { useRouter } from 'next/router';
 import { useTheme } from './ThemeProvider';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const Header = () => {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const { t, i18n } = useTranslation();
+  const [userRole, setUserRole] = useState(null);
 
   const isLoginPage = router.pathname === '/login';
 
+  useEffect(() => {
+    const role = sessionStorage.getItem('userRole');
+    setUserRole(role);
+  }, []);
+
   const changeLanguage = () => {
-    // Mevcut dili değiştir
     const newLanguage = i18n.language === 'en' ? 'tr' : 'en';
     i18n.changeLanguage(newLanguage);
   };
@@ -48,18 +56,34 @@ const Header = () => {
       </div>
       {!isLoginPage && (
         <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          {/* Always visible for logged-in users */}
           <Link href="/profile">
             <span>{t('profile')}</span>
           </Link>
-          <Link href="/schedule">
-            <span>{t('program')}</span>
-          </Link>
-          <Link href="/progress">
-            <span>{t('progress')}</span>
-          </Link>
-          <Link href="/trainers">
-            <span>{t('trainers')}</span>
-          </Link>
+
+          {/* Show these links only if userRole is 'user' */}
+          {userRole === 'user' && (
+            <>
+              <Link href="/schedule">
+                <span>{t('program')}</span>
+              </Link>
+              <Link href="/trainers">
+                <span>{t('trainers')}</span>
+              </Link>
+              <Link href="/progress">
+                <span>{t('progress')}</span>
+              </Link>
+            </>
+          )}
+
+          {/* Show this link only if userRole is 'coach' */}
+          {userRole === 'coach' && (
+            <Link href="/students">
+              <span>{t('myStudents')}</span>
+            </Link>
+          )}
+
+          {/* Create Workout link for all roles (same position as on homepage) */}
           <Link href="/create-workout">
             <button
               style={{
@@ -77,24 +101,26 @@ const Header = () => {
           </Link>
         </nav>
       )}
-      {/* Tema Değiştir Butonu */}
+
+      {/* Theme Toggle Button */}
       <button
-      onClick={toggleTheme}
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        padding: '10px 20px',
-        backgroundColor: theme === 'dark' ? '#333' : '#fff',
-        color: theme === 'dark' ? '#fff' : '#333',
-        border: '1px solid',
-        borderRadius: '5px',
-        cursor: 'pointer',
-      }}
-    >
-      {theme === 'dark' ? t('lightMode') : t('darkMode')}
-    </button>
-      {/* Dil Değiştir Butonu */}
+        onClick={toggleTheme}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          padding: '10px 20px',
+          backgroundColor: theme === 'dark' ? '#333' : '#fff',
+          color: theme === 'dark' ? '#fff' : '#333',
+          border: '1px solid',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        {theme === 'dark' ? t('lightMode') : t('darkMode')}
+      </button>
+
+      {/* Language Toggle Button */}
       <button
         onClick={changeLanguage}
         style={{

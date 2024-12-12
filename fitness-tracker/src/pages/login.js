@@ -8,37 +8,44 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch('https://backend-u0ol.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name: username, password }),
-    });
+    try {
+      const response = await fetch('https://backend-u0ol.onrender.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: username, password }),
+      });
 
-    if (response.status === 200) {
-      const responseData = await response.json();
+      if (response.status === 200) {
+        const responseData = await response.json();
 
-      // Store user details in sessionStorage
-      sessionStorage.setItem('isLoggedIn', 'true');
-      sessionStorage.setItem('userId', responseData.id); // Store the user ID
-      sessionStorage.setItem('userRole', responseData.role); // Store the user role
+        // Store user details in sessionStorage
+        sessionStorage.setItem('isLoggedIn', 'true');
+        
+        if (responseData.role === 'coach') {
+          // If the user is a coach, store coachId
+          sessionStorage.setItem('coachId', responseData.id);
+        } else {
+          // Otherwise, store userId
+          sessionStorage.setItem('userId', responseData.id);
+        }
 
-      router.push('/'); // Redirect to homepage
-    } else if (response.status === 422) {
-      const errorData = await response.json();
-      setError(errorData.detail?.[0]?.msg || 'Validation error occurred.');
-    } else {
-      setError('An unexpected error occurred. Please try again.');
+        sessionStorage.setItem('userRole', responseData.role);
+
+        router.push('/'); // Redirect to homepage
+      } else if (response.status === 422) {
+        const errorData = await response.json();
+        setError(errorData.detail?.[0]?.msg || 'Validation error occurred.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again later.');
     }
-  } catch (err) {
-    setError('An unexpected error occurred. Please try again later.');
-  }
-};
-
+  };
 
   return (
     <div

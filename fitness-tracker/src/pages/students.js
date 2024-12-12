@@ -13,10 +13,16 @@ export default function MyStudents() {
     // Ensure the user is logged in and has the correct role
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
     const userRole = sessionStorage.getItem('userRole');
-    const coachId = sessionStorage.getItem('userId'); // Retrieve coach ID
+    const coachId = sessionStorage.getItem('coachId'); // Retrieve coach ID correctly
 
     if (!isLoggedIn || userRole !== 'coach') {
       router.push('/login'); // Redirect unauthorized users
+      return;
+    }
+
+    if (!coachId) {
+      setError('Coach ID not found. Please log in again.');
+      setLoading(false);
       return;
     }
 
@@ -72,7 +78,7 @@ export default function MyStudents() {
           justifyContent: 'center',
         }}
       >
-        {students.map((student, index) => (
+        {students.map((student) => (
           <div
             key={student.id}
             style={{

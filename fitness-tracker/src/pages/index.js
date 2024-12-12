@@ -41,24 +41,26 @@ export default function Home() {
           gap: '20px',
         }}
       >
-        <Link href="/schedule" passHref>
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '15px 25px',
-              backgroundColor: '#3B82F6',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              cursor: 'pointer',
-            }}
-          >
-            My Program
-          </div>
-        </Link>
+        {userRole === 'user' && (
+          <Link href="/schedule" passHref>
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '15px 25px',
+                backgroundColor: '#3B82F6',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                cursor: 'pointer',
+              }}
+            >
+              My Program
+            </div>
+          </Link>
+        )}
         {userRole === 'user' && (
           <Link href="/trainers" passHref>
             <div
@@ -99,24 +101,26 @@ export default function Home() {
             </div>
           </Link>
         )}
-        <Link href="/progress" passHref>
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '15px 25px',
-              backgroundColor: '#F59E0B',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              cursor: 'pointer',
-            }}
-          >
-            My Progress
-          </div>
-        </Link>
+        {userRole === 'user' && (
+          <Link href="/progress" passHref>
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '15px 25px',
+                backgroundColor: '#F59E0B',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                cursor: 'pointer',
+              }}
+            >
+              My Progress
+            </div>
+          </Link>
+        )}
         <Link href="/create-workout" passHref>
           <div
             style={{

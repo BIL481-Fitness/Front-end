@@ -4,8 +4,8 @@ import { useTheme } from '../components/ThemeProvider';
 export default function Profile() {
   const { theme } = useTheme();
 
-  // State to hold user information
-  const [userInfo, setUserInfo] = useState({
+  // State to hold user or coach information
+  const [info, setInfo] = useState({
     name: '',
     age: '',
     weight: '',
@@ -14,55 +14,109 @@ export default function Profile() {
     bmi: '',
     daily_calories: '',
     goal: '',
+    specialization: '',
+    experience_level: '',
   });
 
-  const [loading, setLoading] = useState(true); // State to track loading
-  const [error, setError] = useState(''); // State to track errors
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userId = sessionStorage.getItem('userId'); // Retrieve the stored userId
+    const role = sessionStorage.getItem('userRole');
 
-      if (!userId) {
-        setError('User data not found. Please log in again.');
-        setLoading(false);
-        return;
-      }
+    if (!role) {
+      setError('Role not found. Please log in again.');
+      setLoading(false);
+      return;
+    }
 
+    const fetchData = async () => {
       try {
-        if (isNaN(userId)) {
-          throw new Error('Invalid user ID');
-        }
+        if (role === 'user') {
+          const userId = sessionStorage.getItem('userId');
+          if (!userId) {
+            setError('User data not found. Please log in again.');
+            setLoading(false);
+            return;
+          }
 
-        const response = await fetch(`https://backend-u0ol.onrender.com/user_info/${userId}`);
-        if (response.ok) {
-          const data = await response.json(); // Parse JSON response
-          setUserInfo({
-            name: data.name,
-            age: data.age,
-            weight: data.weight,
-            height: data.height,
-            fitness_level: data.fitness_level,
-            bmi: data.bmi,
-            daily_calories: data.daily_calories,
-            goal: data.goal,
-          }); // Update state with user data
-        } else if (response.status === 500) {
-          setError('Internal Server Error. Please try again later.');
+          if (isNaN(userId)) {
+            throw new Error('Invalid user ID');
+          }
+
+          const response = await fetch(`https://backend-u0ol.onrender.com/user_info/${userId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setInfo({
+              name: data.name,
+              age: data.age,
+              weight: data.weight,
+              height: data.height,
+              fitness_level: data.fitness_level,
+              bmi: data.bmi,
+              daily_calories: data.daily_calories,
+              goal: data.goal,
+              specialization: '',
+              experience_level: '',
+            });
+          } else if (response.status === 500) {
+            setError('Internal Server Error. Please try again later.');
+          } else {
+            const errorText = await response.text();
+            setError(`Failed to fetch user data: ${errorText}`);
+          }
+        } else if (role === 'coach') {
+          const coachId = sessionStorage.getItem('coachId');
+          if (!coachId) {
+            setError('Coach data not found. Please log in again.');
+            setLoading(false);
+            return;
+          }
+
+          if (isNaN(coachId)) {
+            throw new Error('Invalid coach ID');
+          }
+
+          const response = await fetch(`https://backend-u0ol.onrender.com/coaches`);
+          if (response.ok) {
+            const data = await response.json(); // Array of coaches
+            const coach = data.find((c) => c.id === parseInt(coachId, 10));
+
+            if (!coach) {
+              setError('Coach not found.');
+            } else {
+              setInfo({
+                name: coach.name,
+                age: coach.age,
+                weight: coach.weight,
+                height: coach.height,
+                fitness_level: '',
+                bmi: '',
+                daily_calories: '',
+                goal: '',
+                specialization: coach.specialization,
+                experience_level: coach.experience_level,
+              });
+            }
+          } else if (response.status === 500) {
+            setError('Internal Server Error. Please try again later.');
+          } else {
+            const errorText = await response.text();
+            setError(`Failed to fetch coach data: ${errorText}`);
+          }
         } else {
-          const errorText = await response.text();
-          setError(`Failed to fetch user data: ${errorText}`);
+          setError('Invalid role. Please log in again.');
         }
       } catch (err) {
-        console.error('Error fetching user info:', err);
-        setError('An error occurred while fetching user information.');
+        console.error('Error fetching info:', err);
+        setError('An error occurred while fetching information.');
       } finally {
-        setLoading(false); // Stop loading indicator
+        setLoading(false);
       }
     };
 
-    fetchUserInfo();
-  }, []); // Empty dependency array ensures this runs once on mount
+    fetchData();
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -71,6 +125,8 @@ export default function Profile() {
   if (error) {
     return <div style={{ color: 'red' }}>{error}</div>;
   }
+
+  const isCoach = sessionStorage.getItem('userRole') === 'coach';
 
   return (
     <div
@@ -81,7 +137,9 @@ export default function Profile() {
         padding: '20px',
       }}
     >
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>My Profile</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
+        {isCoach ? 'My Coach Profile' : 'My Profile'}
+      </h1>
       <form
         style={{
           maxWidth: '400px',
@@ -96,16 +154,9 @@ export default function Profile() {
           <input
             type="text"
             name="name"
-            value={userInfo.name}
+            value={info.name}
             readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
+            style={inputStyle(theme)}
           />
         </label>
         <label>
@@ -113,16 +164,9 @@ export default function Profile() {
           <input
             type="number"
             name="age"
-            value={userInfo.age}
+            value={info.age}
             readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
+            style={inputStyle(theme)}
           />
         </label>
         <label>
@@ -130,16 +174,9 @@ export default function Profile() {
           <input
             type="number"
             name="weight"
-            value={userInfo.weight}
+            value={info.weight}
             readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
+            style={inputStyle(theme)}
           />
         </label>
         <label>
@@ -147,87 +184,93 @@ export default function Profile() {
           <input
             type="number"
             name="height"
-            value={userInfo.height}
+            value={info.height}
             readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
+            style={inputStyle(theme)}
           />
         </label>
-        <label>
-          Fitness Level:
-          <input
-            type="number"
-            name="fitness_level"
-            value={userInfo.fitness_level}
-            readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
-          />
-        </label>
-        <label>
-          BMI:
-          <input
-            type="number"
-            name="bmi"
-            value={userInfo.bmi}
-            readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
-          />
-        </label>
-        <label>
-          Daily Calories:
-          <input
-            type="number"
-            name="daily_calories"
-            value={userInfo.daily_calories}
-            readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
-          />
-        </label>
-        <label>
-          Goal:
-          <input
-            type="text"
-            name="goal"
-            value={userInfo.goal}
-            readOnly
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
-              borderRadius: '5px',
-              backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
-              color: theme === 'light' ? '#000000' : '#ffffff',
-            }}
-          />
-        </label>
+
+        {!isCoach && (
+          <>
+            <label>
+              Fitness Level:
+              <input
+                type="number"
+                name="fitness_level"
+                value={info.fitness_level}
+                readOnly
+                style={inputStyle(theme)}
+              />
+            </label>
+            <label>
+              BMI:
+              <input
+                type="number"
+                name="bmi"
+                value={info.bmi}
+                readOnly
+                style={inputStyle(theme)}
+              />
+            </label>
+            <label>
+              Daily Calories:
+              <input
+                type="number"
+                name="daily_calories"
+                value={info.daily_calories}
+                readOnly
+                style={inputStyle(theme)}
+              />
+            </label>
+            <label>
+              Goal:
+              <input
+                type="text"
+                name="goal"
+                value={info.goal}
+                readOnly
+                style={inputStyle(theme)}
+              />
+            </label>
+          </>
+        )}
+
+        {isCoach && (
+          <>
+            <label>
+              Specialization:
+              <input
+                type="text"
+                name="specialization"
+                value={info.specialization}
+                readOnly
+                style={inputStyle(theme)}
+              />
+            </label>
+            <label>
+              Experience Level:
+              <input
+                type="number"
+                name="experience_level"
+                value={info.experience_level}
+                readOnly
+                style={inputStyle(theme)}
+              />
+            </label>
+          </>
+        )}
       </form>
     </div>
   );
+}
+
+function inputStyle(theme) {
+  return {
+    width: '100%',
+    padding: '10px',
+    border: `1px solid ${theme === 'light' ? '#cccccc' : '#444444'}`,
+    borderRadius: '5px',
+    backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
+    color: theme === 'light' ? '#000000' : '#ffffff',
+  };
 }
