@@ -13,16 +13,22 @@ export default function CreateWorkout() {
   const [error, setError] = useState(''); // State to store error message
 
   // Retrieve user_id from sessionStorage (or wherever it's stored)
-  const userId = sessionStorage.getItem('userId'); // Or localStorage.getItem('user_id')
+  const [userId, setUserId] = useState(null);
 
-  // Check if user_id is retrieved correctly
   useEffect(() => {
-    if (!userId) {
-      console.error('User ID is not available in sessionStorage!');
-    } else {
-      console.log('User ID:', userId); // Verify the correct ID is retrieved
+    if (typeof window !== 'undefined') {
+      // Retrieve user_id from sessionStorage (or wherever it's stored)
+      const userId = sessionStorage.getItem('userId'); // Or localStorage.getItem('user_id')
+      setUserId(userId);
+
+      // Check if user_id is retrieved correctly
+      if (!userId) {
+        console.error('User ID is not available in sessionStorage!');
+      } else {
+        console.log('User ID:', userId); // Verify the correct ID is retrieved
+      }
     }
-  }, [userId]);
+  }, []);
 
   // Handle form submission and make API call
   const handleSubmit = async (event) => {
