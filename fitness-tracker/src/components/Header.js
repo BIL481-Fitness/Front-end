@@ -54,54 +54,7 @@ const Header = () => {
           </span>
         </Link>
       </div>
-      {!isLoginPage && (
-        <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          {/* Always visible for logged-in users */}
-          <Link href="/profile">
-            <span>{t('profile')}</span>
-          </Link>
-
-          {/* Show these links only if userRole is 'user' */}
-          {userRole === 'user' && (
-            <>
-              <Link href="/schedule">
-                <span>{t('program')}</span>
-              </Link>
-              <Link href="/trainers">
-                <span>{t('trainers')}</span>
-              </Link>
-              <Link href="/progress">
-                <span>{t('progress')}</span>
-              </Link>
-            </>
-          )}
-
-          {/* Show this link only if userRole is 'coach' */}
-          {userRole === 'coach' && (
-            <Link href="/students">
-              <span>{t('myStudents')}</span>
-            </Link>
-          )}
-
-          {/* Create Workout link for all roles (same position as on homepage) */}
-          <Link href="/create-workout">
-            <button
-              style={{
-                padding: '10px 20px',
-                backgroundColor: theme === 'light' ? '#4B0082' : '#9370DB',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '5px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-            >
-              {t('createWorkout')}
-            </button>
-          </Link>
-        </nav>
-      )}
-
+      
       {/* Theme Toggle Button */}
       <button
         onClick={toggleTheme}
@@ -128,7 +81,7 @@ const Header = () => {
           bottom: '70px',
           right: '20px',
           padding: '10px',
-          backgroundColor: theme === 'light' ? '#007BFF' : '#00C4FF',
+          backgroundColor: theme === 'light' ? '#5a42f5' : '#5a42f5',
           border: 'none',
           borderRadius: '5px',
           display: 'flex',
