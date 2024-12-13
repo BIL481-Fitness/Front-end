@@ -1,89 +1,77 @@
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../components/ThemeProvider'; 
+import { useTheme } from '../components/ThemeProvider';
 import { useState, useEffect } from 'react';
-import { saveAs } from 'file-saver';  // Import file-saver
+import { saveAs } from 'file-saver';
 
 export default function Schedule() {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const [schedule, setSchedule] = useState([]);  // State to store schedule data
-  const [loading, setLoading] = useState(true);   // State to track loading status
-  const [error, setError] = useState('');         // State to track errors
+  const [schedule, setSchedule] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Get the userId from sessionStorage
     const userId = sessionStorage.getItem('userId');
     if (!userId) {
-      setError('User ID not found. Please log in again.');
+      setError(t('user_not_logged_in'));
       setLoading(false);
       return;
     }
 
-    // Fetch schedule data from the API using the userId
     const fetchSchedule = async () => {
       try {
         const response = await fetch(`https://backend-u0ol.onrender.com/workout_plans/${userId}`);
-        
         if (response.ok) {
-          const data = await response.json();  // Parse JSON response
-          
-          // Check if workout plans were found
+          const data = await response.json();
           if (data[0] && data[0].workout_data) {
-            // Parse the workout_data from the API response
             const workoutData = JSON.parse(data[0].workout_data.replace(/'/g, '"'));
-            
-            setSchedule(workoutData);  // Update state with the parsed workout data
+            setSchedule(workoutData);
           } else {
-            setError('No workout data available.');
+            setError(t('no_workout_data'));
           }
         } else {
           const errorText = await response.text();
-          setError(`Failed to fetch schedule: ${errorText}`);
+          setError(t('fetch_error', { status: response.status, message: errorText }));
         }
       } catch (err) {
-        console.error('Error fetching schedule:', err);
-        setError('An error occurred while fetching the schedule.');
+        console.error(t('network_error'), err);
+        setError(t('network_error'));
       } finally {
-        setLoading(false);  // Stop loading once the API request is done
+        setLoading(false);
       }
     };
 
     fetchSchedule();
-  }, []);  // Empty dependency array ensures this runs once on mount
+  }, [t]);
 
-  // Handle Export Schedule button click
   const handleExportSchedule = async () => {
-    // Get the userId from sessionStorage
     const userId = sessionStorage.getItem('userId');
     if (!userId) {
-      setError('User ID not found. Please log in again.');
+      setError(t('user_not_logged_in'));
       return;
     }
 
     try {
-      // Make API request to export the schedule as XLSX
       const response = await fetch(`https://backend-u0ol.onrender.com/export_workout_plan/${userId}`, {
         method: 'GET',
         headers: {
-          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  // For XLSX format
+          Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to export schedule.');
+        throw new Error(t('export_error'));
       }
 
-      // Read the response as a blob (binary data)
       const blob = await response.blob();
-      saveAs(blob, 'workout_schedule.xlsx');  // Use file-saver to trigger the download
+      saveAs(blob, t('workout_schedule_file_name'));
     } catch (error) {
-      console.error('Error exporting schedule:', error);
-      setError('An error occurred while exporting the schedule.');
+      console.error(t('export_error'), error);
+      setError(t('export_error'));
     }
   };
 
-  // Show loading or error if applicable
   if (loading) {
     return (
       <div
@@ -94,13 +82,12 @@ export default function Schedule() {
           color: theme === 'light' ? '#000000' : '#ffffff',
         }}
       >
-        <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>My Schedule</h1>
-        <div>Loading...</div>
+        <h1>{t('my_schedule')}</h1>
+        <div>{t('loading')}</div>
       </div>
     );
   }
 
-  // Display error message or schedule data
   return (
     <div
       style={{
@@ -110,9 +97,7 @@ export default function Schedule() {
         color: theme === 'light' ? '#000000' : '#ffffff',
       }}
     >
-      {/* Flex container with vertical direction */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/* Export Schedule Button */}
         <button
           onClick={handleExportSchedule}
           style={{
@@ -122,28 +107,25 @@ export default function Schedule() {
             fontWeight: 'bold',
             borderRadius: '5px',
             cursor: 'pointer',
-            marginBottom: '20px', // Add space below the button
-            alignSelf: 'flex-end', // Align button to the right
+            marginBottom: '20px',
           }}
         >
-          Export Schedule
+          {t('export_schedule')}
         </button>
-
-        {/* Heading for My Schedule */}
-        <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>My Schedule</h1>
+        <h1>{t('my_schedule')}</h1>
       </div>
 
-      {/* Show error message if any */}
       {error ? (
         <div style={{ color: 'red' }}>
           <strong>{error}</strong>
         </div>
       ) : (
-        <div style={{ padding: '20px' }}>
-          {/* Loop through the parsed workout data */}
+        <div>
           {Object.keys(schedule).map((day, index) => (
             <div key={index} style={{ marginBottom: '20px' }}>
-              <h2>{`Day ${index + 1}: ${day}`}</h2>
+              <h2>
+                {t('day')} {index + 1}: {day}
+              </h2>
               <ul
                 style={{
                   listStyleType: 'none',
@@ -164,8 +146,11 @@ export default function Schedule() {
                       backgroundColor: theme === 'light' ? '#f9f9f9' : '#333333',
                     }}
                   >
-                    <strong>{`${exercise.hareket_adi} (${exercise.bolge})`}</strong> -{' '}
-                    {exercise.set_sayisi} sets of {exercise.tekrar_sayisi} reps, Equipment: {exercise.ekipman}
+                    <strong>
+                      {exercise.hareket_adi} ({exercise.bolge})
+                    </strong>{' '}
+                    - {exercise.set_sayisi} {t('sets')} {exercise.tekrar_sayisi} {t('reps')},{' '}
+                    {t('equipment')}: {exercise.ekipman}
                   </li>
                 ))}
               </ul>

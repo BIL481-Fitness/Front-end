@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../components/ThemeProvider';
+import { useTranslation } from 'react-i18next';
 
 export default function CreateWorkout() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const [age, setAge] = useState('');
   const [weight, setWeight] = useState('');
@@ -18,23 +20,23 @@ export default function CreateWorkout() {
       setUserId(userId);
 
       if (!userId) {
-        console.error('User ID is not available in sessionStorage!');
+        console.error(t('user_id_missing'));
       } else {
-        console.log('User ID:', userId);
+        console.log(t('user_id'), userId);
       }
     }
-  }, []);
+  }, [t]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!age || !weight || !height || !days) {
-      setError('Please fill in all fields.');
+      setError(t('fill_all_fields'));
       return;
     }
 
     if (parseInt(days, 10) > 7) {
-      setError('Days per week cannot exceed 7.');
+      setError(t('days_exceed'));
       return;
     }
 
@@ -48,7 +50,7 @@ export default function CreateWorkout() {
     setError('');
     try {
       if (!userId) {
-        setError('User ID is not available. Please log in.');
+        setError(t('user_id_missing_login'));
         return;
       }
 
@@ -67,19 +69,19 @@ export default function CreateWorkout() {
         setWorkoutPlan(data);
       } else {
         const errorData = await response.json();
-        console.error('API Error:', errorData);
-        setError('There was an issue generating the workout plan.');
+        console.error(t('api_error'), errorData);
+        setError(t('workout_issue'));
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('An error occurred while fetching data.');
+      console.error(t('fetch_error'), error);
+      setError(t('fetch_error_occurred'));
     }
   };
 
   const handleDaysChange = (e) => {
     const value = e.target.value;
     if (value > 7) {
-      setError('Days per week cannot exceed 7.');
+      setError(t('days_exceed'));
     } else {
       setError('');
       setDays(value);
@@ -95,7 +97,7 @@ export default function CreateWorkout() {
         padding: '20px',
       }}
     >
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Create a New Workout</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>{t('create_workout_title')}</h1>
 
       {error && (
         <div style={{ color: 'red', textAlign: 'center', marginBottom: '20px' }}>
@@ -114,10 +116,10 @@ export default function CreateWorkout() {
         }}
       >
         <label>
-          Age:
+          {t('age')}:
           <input
             type="number"
-            placeholder="Enter your age"
+            placeholder={t('enter_age')}
             value={age}
             onChange={(e) => setAge(e.target.value)}
             style={{
@@ -131,10 +133,10 @@ export default function CreateWorkout() {
           />
         </label>
         <label>
-          Weight (kg):
+          {t('weight')} (kg):
           <input
             type="number"
-            placeholder="Enter your weight"
+            placeholder={t('enter_weight')}
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             style={{
@@ -148,10 +150,10 @@ export default function CreateWorkout() {
           />
         </label>
         <label>
-          Height (cm):
+          {t('height')} (cm):
           <input
             type="number"
-            placeholder="Enter your height"
+            placeholder={t('enter_height')}
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             style={{
@@ -165,10 +167,10 @@ export default function CreateWorkout() {
           />
         </label>
         <label>
-          Days per week:
+          {t('days_per_week')}:
           <input
             type="number"
-            placeholder="Enter the number of days per week"
+            placeholder={t('enter_days')}
             value={days}
             onChange={handleDaysChange}
             style={{
@@ -193,24 +195,24 @@ export default function CreateWorkout() {
             cursor: 'pointer',
           }}
         >
-          Generate Workout Plan
+          {t('generate_workout')}
         </button>
       </form>
 
       {workoutPlan && (
         <div style={{ marginTop: '40px' }}>
-          <h2>Generated Workout Plan</h2>
+          <h2>{t('generated_workout')}</h2>
           {workoutPlan.map((day, index) => (
             <div key={index}>
               <h3>
-                Day {index + 1}: {day.day}
+                {t('day')} {index + 1}: {day.day}
               </h3>
               <ul>
                 {day.exercises.map((exercise, idx) => (
                   <li key={idx}>
                     <strong>{exercise.hareket_adi}</strong> ({exercise.bolge}) -{' '}
-                    {exercise.set_sayisi} sets of {exercise.tekrar_sayisi} reps, Equipment:{' '}
-                    {exercise.ekipman}
+                    {exercise.set_sayisi} {t('sets_of')} {exercise.tekrar_sayisi}{' '}
+                    {t('reps')}, {t('equipment')}: {exercise.ekipman}
                   </li>
                 ))}
               </ul>

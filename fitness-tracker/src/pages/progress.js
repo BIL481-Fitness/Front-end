@@ -1,6 +1,7 @@
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -9,6 +10,7 @@ export default function ExerciseProgress() {
   const [userInputSets, setUserInputSets] = useState({}); // Kullanıcının girdiği set sayıları
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const exerciseList = [
     "Bench Press",
@@ -61,15 +63,15 @@ export default function ExerciseProgress() {
     "Bulgarian Split Squat",
     "Calf Raise",
     "Hack Squat",
-    "Step-Up",
-  ];
+    "Step-Up",
+  ];
 
   useEffect(() => {
     const fetchProgressData = async () => {
       try {
         const user_id = sessionStorage.getItem('userId'); // Kullanıcı ID'sini alıyoruz.
         if (!user_id) {
-          setError('User not logged in. Please log in to view your progress.');
+          setError(t('user_not_logged_in'));
           setLoading(false);
           return;
         }
@@ -92,27 +94,27 @@ export default function ExerciseProgress() {
         }
 
         if (validExercises.length === 0) {
-          setError('No data available for any exercises.');
+          setError(t('no_data'));
         } else {
           setUserFitnessData(validExercises);
         }
       } catch (err) {
         console.error('Error:', err);
-        setError('An error occurred while fetching data.');
+        setError(t('fetch_error'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchProgressData();
-  }, []);
+  }, [t]);
 
   const handleInputChange = (exercise, value) => {
     setUserInputSets((prev) => ({ ...prev, [exercise]: Number(value) }));
   };
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '20px' }}>Loading progress data...</div>;
+    return <div style={{ textAlign: 'center', padding: '20px' }}>{t('loading_progress')}</div>;
   }
 
   if (error) {
@@ -120,12 +122,12 @@ export default function ExerciseProgress() {
   }
 
   if (userFitnessData.length === 0) {
-    return <div style={{ textAlign: 'center', padding: '20px' }}>No exercise data to display.</div>;
+    return <div style={{ textAlign: 'center', padding: '20px' }}>{t('no_exercise_data')}</div>;
   }
 
   return (
     <div style={{ padding: '20px', minHeight: '100vh' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Exercise Progress</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>{t('exercise_progress')}</h1>
       {userFitnessData.map((exerciseData, index) => {
         const labels = exerciseData.data.map((d) => d.date);
         const actualSets = exerciseData.data.map((d) => d.sets);
@@ -137,7 +139,7 @@ export default function ExerciseProgress() {
           <div key={index} style={{ marginBottom: '40px' }}>
             <h2 style={{ textAlign: 'center' }}>{exerciseData.exercise}</h2>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <label style={{ marginRight: '10px' }}>Your Sets:</label>
+              <label style={{ marginRight: '10px' }}>{t('your_sets')}:</label>
               <input
                 type="number"
                 value={userSets}
@@ -147,19 +149,19 @@ export default function ExerciseProgress() {
             </div>
             {userSets < lastExpectedSet ? (
               <div style={{ textAlign: 'center', color: 'red', marginBottom: '10px' }}>
-                Keep pushing! You're almost there. Aim for at least {lastExpectedSet} sets!
+                {t('keep_pushing', { target: lastExpectedSet })}
               </div>
             ) : (
               <div style={{ textAlign: 'center', color: 'green', marginBottom: '10px' }}>
-                WELL DONE! You're meeting or exceeding your target!
+                {t('well_done')}
               </div>
             )}
             <Bar
               data={{
-                labels: ['Expected Progress', 'Your Progress'],
+                labels: [t('expected_progress'), t('your_progress')],
                 datasets: [
                   {
-                    label: `${exerciseData.exercise} Expected Sets`,
+                    label: `${exerciseData.exercise} ${t('expected_sets')}`,
                     data: [lastExpectedSet, userSets],
                     backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(75, 192, 192, 0.2)'],
                     borderColor: ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'],
@@ -174,7 +176,7 @@ export default function ExerciseProgress() {
                     beginAtZero: true,
                     title: {
                       display: true,
-                      text: 'Sets',
+                      text: t('sets'),
                     },
                   },
                 },

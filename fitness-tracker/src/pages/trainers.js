@@ -1,53 +1,54 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTheme } from '../components/ThemeProvider';
+import { useTranslation } from 'react-i18next';
 
 export default function Trainers() {
   const { theme } = useTheme();
   const router = useRouter();
+  const { t } = useTranslation();
+
   const [coaches, setCoaches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCoach, setSelectedCoach] = useState(null);
 
   useEffect(() => {
-    // Ensure the user is logged in and has the correct role
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
     const userRole = sessionStorage.getItem('userRole');
 
     if (!isLoggedIn || userRole !== 'user') {
-      router.push('/login'); // Redirect unauthorized users
+      router.push('/login');
       return;
     }
 
-    // Fetch the list of coaches
     const fetchCoaches = async () => {
       try {
         const response = await fetch('https://backend-u0ol.onrender.com/coaches', {
           method: 'GET',
           headers: {
-            'Accept': 'application/json', // Ensure JSON response is expected
+            Accept: 'application/json',
           },
         });
-    
+
         if (response.ok) {
-          const data = await response.json(); // Parse JSON response
-          setCoaches(data); // Set state with fetched coaches
+          const data = await response.json();
+          setCoaches(data);
         } else {
-          const errorMessage = `Failed to fetch coaches. Status: ${response.status} - ${response.statusText}`;
+          const errorMessage = t('fetch_error', { status: response.status });
           console.error(errorMessage);
           setError(errorMessage);
         }
       } catch (err) {
-        console.error('Network error:', err);
-        setError('A network error occurred. Please check your connection and try again.');
+        console.error(t('network_error'), err);
+        setError(t('network_error'));
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchCoaches();
-  }, [router]);
+  }, [router, t]);
 
   const handleSelectCoach = async (coachId) => {
     const userId = sessionStorage.getItem('userId');
@@ -65,20 +66,19 @@ export default function Trainers() {
       });
 
       if (response.ok) {
-        const result = await response.text();
-        alert(`Coach selected successfully: ${result}`);
-        setSelectedCoach(coachId); // Update the selected coach state
+        alert(t('coach_selected'));
+        setSelectedCoach(coachId);
       } else {
         const errorData = await response.json();
-        alert(errorData.detail?.[0]?.msg || 'An error occurred while selecting the coach.');
+        alert(errorData.detail?.[0]?.msg || t('coach_select_error'));
       }
     } catch (err) {
-      alert('A network error occurred. Please try again later.');
+      alert(t('network_error'));
     }
   };
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '20px' }}>Loading coaches...</div>;
+    return <div style={{ textAlign: 'center', padding: '20px' }}>{t('loading_coaches')}</div>;
   }
 
   if (error) {
@@ -98,7 +98,7 @@ export default function Trainers() {
         padding: '20px',
       }}
     >
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Available Coaches</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>{t('available_coaches')}</h1>
       <div
         style={{
           display: 'flex',
@@ -120,8 +120,8 @@ export default function Trainers() {
             }}
           >
             <h3>{coach.name}</h3>
-            <p>Specialization: {coach.specialization}</p>
-            <p>Experience Level: {coach.experience_level}</p>
+            <p>{t('specialization')}: {coach.specialization}</p>
+            <p>{t('experience_level')}: {coach.experience_level}</p>
             <button
               onClick={() => handleSelectCoach(coach.id)}
               style={{
@@ -135,7 +135,7 @@ export default function Trainers() {
               }}
               disabled={selectedCoach === coach.id}
             >
-              {selectedCoach === coach.id ? 'Selected' : 'Select Coach'}
+              {selectedCoach === coach.id ? t('selected') : t('select_coach')}
             </button>
           </div>
         ))}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTheme } from '../components/ThemeProvider';
+import { useTranslation } from 'react-i18next';
 
 export default function MyStudents() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const router = useRouter();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function MyStudents() {
     }
 
     if (!coachId) {
-      setError('Coach ID not found. Please log in again.');
+      setError(t('coach_id_not_found'));
       setLoading(false);
       return;
     }
@@ -34,22 +36,26 @@ export default function MyStudents() {
           setStudents(data); // Update students state with API data
         } else if (response.status === 422) {
           const errorData = await response.json();
-          setError(errorData.detail?.[0]?.msg || 'Validation error occurred.');
+          setError(errorData.detail?.[0]?.msg || t('validation_error'));
         } else {
-          setError('An unexpected error occurred while fetching students.');
+          setError(t('unexpected_error'));
         }
       } catch (err) {
-        setError('A network error occurred. Please try again later.');
+        setError(t('network_error'));
       } finally {
         setLoading(false); // Stop loading state
       }
     };
 
     fetchStudents();
-  }, [router]);
+  }, [router, t]);
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '20px' }}>Loading students...</div>;
+    return (
+      <div style={{ textAlign: 'center', padding: '20px' }}>
+        {t('loading_students')}
+      </div>
+    );
   }
 
   if (error) {
@@ -69,7 +75,9 @@ export default function MyStudents() {
         padding: '20px',
       }}
     >
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>My Students</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
+        {t('my_students')}
+      </h1>
       <div
         style={{
           display: 'flex',
@@ -91,13 +99,13 @@ export default function MyStudents() {
             }}
           >
             <h3>{student.name}</h3>
-            <p>Age: {student.age}</p>
-            <p>Weight: {student.weight} kg</p>
-            <p>Height: {student.height} cm</p>
-            <p>Fitness Level: {student.fitness_level}</p>
-            <p>BMI: {student.bmi}</p>
-            <p>Daily Calories: {student.daily_calories}</p>
-            <p>Goal: {student.goal}</p>
+            <p>{t('age')}: {student.age}</p>
+            <p>{t('weight')}: {student.weight} kg</p>
+            <p>{t('height')}: {student.height} cm</p>
+            <p>{t('fitness_level')}: {student.fitness_level}</p>
+            <p>{t('bmi')}: {student.bmi}</p>
+            <p>{t('daily_calories')}: {student.daily_calories}</p>
+            <p>{t('goal')}: {student.goal}</p>
           </div>
         ))}
       </div>

@@ -31,8 +31,8 @@ export default function Home() {
         fontFamily: 'Arial, sans-serif',
       }}
     >
-      <h1>Welcome to Home Page!</h1>
-      <p>You have successfully logged in.</p>
+      <h1>{t('welcome_home')}</h1>
+      <p>{t('login_success')}</p>
       <div
         style={{
           display: 'flex',
@@ -40,7 +40,8 @@ export default function Home() {
           flexWrap: 'wrap',
           gap: '20px',
         }}
-        >{userRole === 'user' && (
+      >
+        {userRole === 'user' && (
           <Link href="/profile" passHref>
             <div
               style={{
@@ -56,7 +57,7 @@ export default function Home() {
                 cursor: 'pointer',
               }}
             >
-              My Profile
+              {t('my_profile')}
             </div>
           </Link>
         )}
@@ -76,7 +77,7 @@ export default function Home() {
                 cursor: 'pointer',
               }}
             >
-              My Program
+              {t('my_program')}
             </div>
           </Link>
         )}
@@ -96,7 +97,7 @@ export default function Home() {
                 cursor: 'pointer',
               }}
             >
-              Personal Trainers
+              {t('personal_trainers')}
             </div>
           </Link>
         )}
@@ -116,7 +117,7 @@ export default function Home() {
                 cursor: 'pointer',
               }}
             >
-              My Students
+              {t('my_students')}
             </div>
           </Link>
         )}
@@ -136,29 +137,29 @@ export default function Home() {
                 cursor: 'pointer',
               }}
             >
-              My Progress
+              {t('my_progress')}
             </div>
           </Link>
         )}
         {userRole === 'user' && (
-        <Link href="/create-workout" passHref>
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '15px 25px',
-              backgroundColor: '#5a42f5',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              cursor: 'pointer',
-            }}
-          >
-            Create Workout
-          </div>
-        </Link>
+          <Link href="/create-workout" passHref>
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '15px 25px',
+                backgroundColor: '#5a42f5',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                cursor: 'pointer',
+              }}
+            >
+              {t('create_workout')}
+            </div>
+          </Link>
         )}
       </div>
     </div>

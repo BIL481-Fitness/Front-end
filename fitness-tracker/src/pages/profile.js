@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../components/ThemeProvider';
+import { useTranslation } from 'react-i18next';
 
 export default function Profile() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
-  // State to hold user or coach information
   const [info, setInfo] = useState({
     name: '',
     age: '',
@@ -18,14 +19,14 @@ export default function Profile() {
     experience_level: '',
   });
 
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const role = sessionStorage.getItem('userRole');
 
     if (!role) {
-      setError('Role not found. Please log in again.');
+      setError(t('role_missing'));
       setLoading(false);
       return;
     }
@@ -35,13 +36,9 @@ export default function Profile() {
         if (role === 'user') {
           const userId = sessionStorage.getItem('userId');
           if (!userId) {
-            setError('User data not found. Please log in again.');
+            setError(t('user_data_missing'));
             setLoading(false);
             return;
-          }
-
-          if (isNaN(userId)) {
-            throw new Error('Invalid user ID');
           }
 
           const response = await fetch(`https://backend-u0ol.onrender.com/user_info/${userId}`);
@@ -59,67 +56,51 @@ export default function Profile() {
               specialization: '',
               experience_level: '',
             });
-          } else if (response.status === 500) {
-            setError('Internal Server Error. Please try again later.');
           } else {
-            const errorText = await response.text();
-            setError(`Failed to fetch user data: ${errorText}`);
+            setError(t('fetch_error'));
           }
         } else if (role === 'coach') {
           const coachId = sessionStorage.getItem('coachId');
           if (!coachId) {
-            setError('Coach data not found. Please log in again.');
+            setError(t('coach_data_missing'));
             setLoading(false);
             return;
           }
 
-          if (isNaN(coachId)) {
-            throw new Error('Invalid coach ID');
-          }
-
           const response = await fetch(`https://backend-u0ol.onrender.com/coaches`);
           if (response.ok) {
-            const data = await response.json(); // Array of coaches
+            const data = await response.json();
             const coach = data.find((c) => c.id === parseInt(coachId, 10));
-
             if (!coach) {
-              setError('Coach not found.');
+              setError(t('coach_not_found'));
             } else {
               setInfo({
                 name: coach.name,
                 age: coach.age,
                 weight: coach.weight,
                 height: coach.height,
-                fitness_level: '',
-                bmi: '',
-                daily_calories: '',
-                goal: '',
                 specialization: coach.specialization,
                 experience_level: coach.experience_level,
               });
             }
-          } else if (response.status === 500) {
-            setError('Internal Server Error. Please try again later.');
           } else {
-            const errorText = await response.text();
-            setError(`Failed to fetch coach data: ${errorText}`);
+            setError(t('fetch_error'));
           }
         } else {
-          setError('Invalid role. Please log in again.');
+          setError(t('invalid_role'));
         }
       } catch (err) {
-        console.error('Error fetching info:', err);
-        setError('An error occurred while fetching information.');
+        setError(t('unexpected_error'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [t]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t('loading')}</div>;
   }
 
   if (error) {
@@ -138,7 +119,7 @@ export default function Profile() {
       }}
     >
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
-        {isCoach ? 'My Coach Profile' : 'My Profile'}
+        {isCoach ? t('coach_profile') : t('user_profile')}
       </h1>
       <form
         style={{
@@ -150,7 +131,7 @@ export default function Profile() {
         }}
       >
         <label>
-          Name:
+          {t('name')}:
           <input
             type="text"
             name="name"
@@ -160,7 +141,7 @@ export default function Profile() {
           />
         </label>
         <label>
-          Age:
+          {t('age')}:
           <input
             type="number"
             name="age"
@@ -170,7 +151,7 @@ export default function Profile() {
           />
         </label>
         <label>
-          Weight (kg):
+          {t('weight')} (kg):
           <input
             type="number"
             name="weight"
@@ -180,7 +161,7 @@ export default function Profile() {
           />
         </label>
         <label>
-          Height (cm):
+          {t('height')} (cm):
           <input
             type="number"
             name="height"
@@ -189,11 +170,10 @@ export default function Profile() {
             style={inputStyle(theme)}
           />
         </label>
-
         {!isCoach && (
           <>
             <label>
-              Fitness Level:
+              {t('fitness_level')}:
               <input
                 type="number"
                 name="fitness_level"
@@ -203,7 +183,7 @@ export default function Profile() {
               />
             </label>
             <label>
-              BMI:
+              {t('bmi')}:
               <input
                 type="number"
                 name="bmi"
@@ -213,7 +193,7 @@ export default function Profile() {
               />
             </label>
             <label>
-              Daily Calories:
+              {t('daily_calories')}:
               <input
                 type="number"
                 name="daily_calories"
@@ -223,7 +203,7 @@ export default function Profile() {
               />
             </label>
             <label>
-              Goal:
+              {t('goal')}:
               <input
                 type="text"
                 name="goal"
@@ -234,11 +214,10 @@ export default function Profile() {
             </label>
           </>
         )}
-
         {isCoach && (
           <>
             <label>
-              Specialization:
+              {t('specialization')}:
               <input
                 type="text"
                 name="specialization"
@@ -248,7 +227,7 @@ export default function Profile() {
               />
             </label>
             <label>
-              Experience Level:
+              {t('experience_level')}:
               <input
                 type="number"
                 name="experience_level"
