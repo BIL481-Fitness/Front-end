@@ -1,17 +1,13 @@
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
-import { useTheme } from '../components/ThemeProvider';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export default function Progress() {
-  const { theme } = useTheme();
-  const [userFitnessData, setUserFitnessData] = useState([]);
-  const [labels, setLabels] = useState([]);
-  const [selectedExercise, setSelectedExercise] = useState('Bench Press'); // Default exercise
-  const [loading, setLoading] = useState(true);
+export default function ExerciseProgress() {
+  const [userFitnessData, setUserFitnessData] = useState([]); // Kullanıcının yaptığı egzersizlerin verileri
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const exerciseList = [
     "Bench Press",
@@ -47,33 +43,14 @@ export default function Progress() {
     "Wrist Curl",
     "Reverse Wrist Curl",
     "Farmer's Walk",
-    "Reverse Curl",
-    "Zottman Curl",
-    "Hammer Curl",
-    "Preacher Curl",
-    "Plate Pinch",
-    "Cable Curl",
-    "Reverse Barbell Curl",
     "Tricep Pushdown",
     "Skull Crushers",
-    "Dips",
     "Close Grip Bench Press",
     "Overhead Tricep Extension",
-    "Tricep Kickback",
-    "Rope Tricep Extension",
-    "Tricep Dips (Bench)",
-    "One-Arm Overhead Extension",
-    "Cable Overhead Tricep Extension",
     "Pull-Up",
     "Lat Pulldown",
     "Barbell Row",
     "Deadlift",
-    "T-Bar Row",
-    "Seated Row",
-    "Dumbbell Row",
-    "Face Pull",
-    "Hyperextension",
-    "Chin-Up",
     "Squat",
     "Leg Press",
     "Lunges",
@@ -89,134 +66,98 @@ export default function Progress() {
   useEffect(() => {
     const fetchProgressData = async () => {
       try {
-        const userId = sessionStorage.getItem('userId'); // userId'yi alıyoruz.
-  
-        if (!userId) {
+        const user_id = sessionStorage.getItem('userId'); // Kullanıcı ID'sini alıyoruz.
+        if (!user_id) {
           setError('User not logged in. Please log in to view your progress.');
           setLoading(false);
           return;
         }
-  
-        // API çağrısını user_id formatında yapıyoruz.
-        const apiUrl = `https://backend-u0ol.onrender.com/user_fitness_data/${userId}/exercise/${encodeURIComponent(selectedExercise)}`;
-  
-        const response = await fetch(apiUrl);
-  
-        if (response.ok) {
-          const fitnessData = await response.json();
-  
-          if (fitnessData.length === 0) {
-            setError('No progress data available for this exercise.');
-            setUserFitnessData([]);
-            setLabels([]);
-            return;
+
+        let validExercises = [];
+
+        for (const exercise of exerciseList) {
+          const apiUrl = `https://backend-u0ol.onrender.com/user_fitness_data/${user_id}/exercise/${encodeURIComponent(exercise)}`;
+          const response = await fetch(apiUrl);
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.length > 0) {
+              validExercises.push({
+                exercise,
+                data,
+              });
+            }
           }
-  
-          const labels = fitnessData.map((data) => data.week);
-          const weightData = fitnessData.map((data) => data.weight);
-  
-          setLabels(labels);
-          setUserFitnessData(weightData);
+        }
+
+        if (validExercises.length === 0) {
+          setError('No data available for any exercises.');
         } else {
-          const errorText = await response.text();
-          setError(`Failed to fetch progress data: ${errorText}`);
+          setUserFitnessData(validExercises);
         }
       } catch (err) {
-        console.error('Error fetching progress data:', err);
-        setError('A network error occurred. Please try again later.');
+        console.error('Error:', err);
+        setError('An error occurred while fetching data.');
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchProgressData();
-  }, [selectedExercise]);
-  
-  
-
-  const data = {
-    labels: labels.length > 0 ? labels : ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
-    datasets: [
-      {
-        label: `Weight Lifted (kg) - ${selectedExercise}`,
-        data: userFitnessData.length > 0 ? userFitnessData : [50, 55, 60, 65, 70, 75],
-        borderColor: '#00C4FF',
-        backgroundColor: 'rgba(0, 196, 255, 0.2)',
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        labels: {
-          color: theme === 'light' ? '#000000' : '#ffffff',
-        },
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: theme === 'light' ? '#000000' : '#ffffff',
-        },
-        grid: {
-          color: theme === 'light' ? '#cccccc' : '#444444',
-        },
-      },
-      y: {
-        ticks: {
-          color: theme === 'light' ? '#000000' : '#ffffff',
-        },
-        grid: {
-          color: theme === 'light' ? '#cccccc' : '#444444',
-        },
-      },
-    },
-  };
+  }, []);
 
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '20px' }}>Loading progress data...</div>;
   }
 
   if (error) {
-    return (
-      <div style={{ textAlign: 'center', color: 'red', padding: '20px' }}>
-        <p>{error}</p>
-      </div>
-    );
+    return <div style={{ textAlign: 'center', color: 'red', padding: '20px' }}>{error}</div>;
+  }
+
+  if (userFitnessData.length === 0) {
+    return <div style={{ textAlign: 'center', padding: '20px' }}>No exercise data to display.</div>;
   }
 
   return (
     <div style={{ padding: '20px', minHeight: '100vh' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>My Progress</h1>
-
-      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <label htmlFor="exercise-select" style={{ marginRight: '10px' }}>
-          Select Exercise:
-        </label>
-        <select
-          id="exercise-select"
-          value={selectedExercise}
-          onChange={(e) => setSelectedExercise(e.target.value)}
-          style={{
-            padding: '10px',
-            borderRadius: '5px',
-            border: '1px solid #cccccc',
-            backgroundColor: theme === 'light' ? '#ffffff' : '#333333',
-            color: theme === 'light' ? '#000000' : '#ffffff',
-          }}
-        >
-          {exerciseList.map((exercise, index) => (
-            <option key={index} value={exercise}>
-              {exercise}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <Line data={data} options={options} />
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Exercise Progress</h1>
+      {userFitnessData.map((exerciseData, index) => (
+        <div key={index} style={{ marginBottom: '40px' }}>
+          <h2 style={{ textAlign: 'center' }}>{exerciseData.exercise}</h2>
+          <Bar
+            data={{
+              labels: exerciseData.data.map((d) => d.date),
+              datasets: [
+                {
+                  label: `${exerciseData.exercise} Sets`,
+                  data: exerciseData.data.map((d) => d.sets),
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1,
+                },
+              ],
+            }}
+            options={{
+              responsive: true,
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Date',
+                  },
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Sets',
+                  },
+                  beginAtZero: true,
+                },
+              },
+            }}
+          />
+        </div>
+      ))}
     </div>
   );
 }
